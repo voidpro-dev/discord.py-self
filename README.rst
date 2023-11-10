@@ -62,13 +62,14 @@ To install, do the following:
     $ git clone https://github.com/voidpro-dev/discord.py-self
     $ cd discord.py-self
     $ python3 -m pip install -U .[voice]
+..
 
 or
 
 .. code:: sh
 
     $ pip install git+https://github.com/voidpro-dev/discord.py-self.git
-
+..
 
 Optional Packages
 ~~~~~~~~~~~~~~~~~~
