@@ -476,9 +476,9 @@ class DiscordWebSocket:
             'd': {
                 'token': self.token,
                 #'platform': 'desktop',
-                "properties": {"$os":"windows","$browser":"Discord","$device": "desktop" },
+                #"properties": {"$os":"windows","$browser":"Discord","$device": "desktop" },
                 'capabilities': self.capabilities.value,
-                #'properties': self._super_properties,
+                'properties': self._super_properties,
                 'presence': presence,
                 'compress': not self._zlib_enabled,  # We require at least one form of compression
                 'client_state': {
