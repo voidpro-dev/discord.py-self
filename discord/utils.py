@@ -1,3 +1,4 @@
+
 """
 The MIT License (MIT)
 
@@ -1454,6 +1455,8 @@ async def _get_info(session: ClientSession) -> Tuple[Dict[str, Any], str]:
         "os":"Windows",
         "browser":"Discord Client",
         "release_channel":"stable",
+        'browser_user_agent': ua,
+        'browser_version': bv,
         "client_version":"1.0.9008",
         "os_version":"10.0.19044",
         "os_arch":"x64",
