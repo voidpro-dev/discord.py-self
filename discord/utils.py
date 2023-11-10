@@ -1481,9 +1481,9 @@ async def _get_build_number(session: ClientSession) -> int:  # Thank you Discord
         build_file = await build_request.text()
         build_index = build_file.find('buildNumber') + 24
         return int(build_file[build_index : build_index + 6])
-    except asyncio.TimeoutError:
+    except:
         _log.critical('Could not fetch client build number. Falling back to hardcoded value...')
-        return 9999
+        return 203010
 
 
 async def _get_user_agent(session: ClientSession) -> str:
