@@ -571,6 +571,7 @@ class HTTPClient:
         self,
         connector: Optional[aiohttp.BaseConnector] = None,
         *,
+        super_properties:Optional[dict] = {},
         proxy: Optional[str] = None,
         proxy_auth: Optional[aiohttp.BasicAuth] = None,
         unsync_clock: bool = True,
@@ -601,7 +602,7 @@ class HTTPClient:
         self.max_ratelimit_timeout: Optional[float] = max(30.0, max_ratelimit_timeout) if max_ratelimit_timeout else None
         self.get_locale: Callable[[], str] = locale
 
-        self.super_properties: Dict[str, Any] = {}
+        self.super_properties: Dict[str, Any] = super_properties
         self.encoded_super_properties: str = MISSING
         self._started: bool = False
 
