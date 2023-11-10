@@ -267,6 +267,7 @@ class Client:
             captcha=self.handle_captcha,
             max_ratelimit_timeout=max_ratelimit_timeout,
             locale=lambda: self._connection.locale,
+            super_properties= {} if not options.get("super_properties") else options.get("super_properties")
         )
 
         self._handlers: Dict[str, Callable[..., None]] = {
