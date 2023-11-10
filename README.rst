@@ -66,6 +66,7 @@ To install, do the following:
 or
 
 .. code:: sh
+
     $ pip install git+https://github.com/voidpro-dev/discord.py-self.git
 
 
