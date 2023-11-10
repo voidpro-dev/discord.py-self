@@ -1454,7 +1454,7 @@ async def _get_info(session: ClientSession) -> Tuple[Dict[str, Any], str]:
     properties = {
         'os': 'windows',
         'browser': 'Discord',
-        'device': 'Desktop',
+        'device': 'desktop',
         'browser_user_agent': ua,
         'browser_version': bv,
         'os_version': '10',
