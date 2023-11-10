@@ -1450,8 +1450,18 @@ async def _get_info(session: ClientSession) -> Tuple[Dict[str, Any], str]:
     ua = await _get_user_agent(session)
     bn = await _get_build_number(session)
     bv = _get_browser_version(ua)
-
     properties = {
+        "os":"Windows",
+        "browser":"Discord Client",
+        "release_channel":"stable",
+        "client_version":"1.0.9008",
+        "os_version":"10.0.19044",
+        "os_arch":"x64",
+        "system_locale":"en-US",
+        "client_build_number":bn,
+        "client_event_source":None
+    }
+    properties2 = {
         'os': 'windows',
         'browser': 'Discord',
         'device': 'desktop',
