@@ -1438,13 +1438,13 @@ class ExpiringString(collections.UserString):
 
 
 async def _get_info(session: ClientSession) -> Tuple[Dict[str, Any], str]:
-    for _ in range(3):
-        try:
-            async with session.post('https://cordapi.dolfi.es/api/v2/properties/web', timeout=5) as resp:
-                json = await resp.json()
-                return json['properties'], json['encoded']
-        except Exception:
-            continue
+    #for _ in range(3):
+    #    try:
+    #        async with session.post('https://cordapi.dolfi.es/api/v2/properties/web', timeout=5) as resp:
+    #            json = await resp.json()
+    #            return json['properties'], json['encoded']
+    #    except Exception:
+    #        continue
 
     _log.warning('Info API down. Falling back to manual fetching...')
     ua = await _get_user_agent(session)
@@ -1452,9 +1452,9 @@ async def _get_info(session: ClientSession) -> Tuple[Dict[str, Any], str]:
     bv = _get_browser_version(ua)
 
     properties = {
-        'os': 'Windows',
-        'browser': 'Chrome',
-        'device': '',
+        'os': 'windows',
+        'browser': 'Discord',
+        'device': 'Desktop',
         'browser_user_agent': ua,
         'browser_version': bv,
         'os_version': '10',
