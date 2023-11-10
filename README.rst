@@ -55,34 +55,18 @@ Installing
 
 **Python 3.8 or higher is required.**
 
-To install the library without full voice support, you can just run the following command:
+To install, do the following:
 
 .. code:: sh
 
-    # Linux/macOS
-    python3 -m pip install -U discord.py-self
-
-    # Windows
-    py -3 -m pip install -U discord.py-self
-
-Otherwise to get voice support you should run the following command:
-
-.. code:: sh
-
-    # Linux/macOS
-    python3 -m pip install -U "discord.py-self[voice]"
-
-    # Windows
-    py -3 -m pip install -U discord.py-self[voice]
-
-
-To install the development version, do the following:
-
-.. code:: sh
-
-    $ git clone https://github.com/dolfies/discord.py-self
+    $ git clone https://github.com/voidpro-dev/discord.py-self
     $ cd discord.py-self
     $ python3 -m pip install -U .[voice]
+
+or
+
+.. code:: sh
+    $ pip install git+https://github.com/voidpro-dev/discord.py-self.git
 
 
 Optional Packages
