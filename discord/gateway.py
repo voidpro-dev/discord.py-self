@@ -475,7 +475,8 @@ class DiscordWebSocket:
             'op': self.IDENTIFY,
             'd': {
                 'token': self.token,
-                'platform': 'desktop',
+                #'platform': 'desktop',
+                #"properties": {"$os":"windows","$browser":"Discord","$device": "desktop" }
                 'capabilities': self.capabilities.value,
                 'properties': self._super_properties,
                 'presence': presence,
