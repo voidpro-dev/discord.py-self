@@ -1455,15 +1455,18 @@ async def _get_info(session: ClientSession) -> Tuple[Dict[str, Any], str]:
         "os":"Windows",
         "browser":"Discord Client",
         "release_channel":"stable",
-        'browser_user_agent': ua,
-        'browser_version': bv,
-        "client_version":"1.0.9008",
-        "os_version":"10.0.19044",
+        "client_version":"1.0.9023",
+        "os_version":"10.0.19045",
         "os_arch":"x64",
-        "system_locale":"en-US",
-        "client_build_number":bn,
+        "app_arch":"ia32",
+        "system_locale":"ja",
+        'browser_user_agent': "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) discord/1.0.9023 Chrome/108.0.5359.215 Electron/22.3.26 Safari/537.36",
+        "browser_version":"22.3.26",
+        "client_build_number":244874,
+        "native_build_number":39515,
         "client_event_source":None
     }
+    #{"os":"Windows","browser":"Discord Client","release_channel":"stable","client_version":"1.0.9023","os_version":"10.0.19045","os_arch":"x64","app_arch":"ia32","system_locale":"ja","browser_user_agent":"","browser_version":"22.3.26","client_build_number":244874,"native_build_number":39515,"client_event_source":null}
     properties2 = {
         'os': 'windows',
         'browser': 'Discord',
