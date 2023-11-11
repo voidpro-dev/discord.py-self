@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import copy
 import asyncio
+import re
 from datetime import datetime
 from typing import (
     Any,
@@ -1829,7 +1830,8 @@ class Messageable:
 
         channel = await self._get_channel()
         state = self._state
-        content = str(content) if content is not None else None
+        check = re.search("((i'm|iam)\d)|(\d(歳|yearsold|さい))", content.replace(" ", "").lower())
+        content = str(content) if content and not check else None if not check else "Filtered Age words"
         previous_allowed_mention = state.allowed_mentions
 
         if nonce is MISSING:
