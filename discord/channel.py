@@ -4368,6 +4368,8 @@ class GroupChannel(discord.abc.Messageable, discord.abc.Connectable, discord.abc
         *,
         timeout: float = 60.0,
         reconnect: bool = True,
+        self_mute: bool = False,
+        self_deaf: bool = False,
         cls: Callable[[Client, discord.abc.VocalChannel], T] = VoiceClient,
         ring: bool = True,
     ) -> T:
@@ -4375,7 +4377,7 @@ class GroupChannel(discord.abc.Messageable, discord.abc.Connectable, discord.abc
         call = self.call
         if call is None and ring:
             await self._initial_ring()
-        return await super().connect(timeout=timeout, reconnect=reconnect, cls=cls)
+        return await super().connect(timeout=timeout, self_mute=self_mute, self_deaf=self_deaf, reconnect=reconnect, cls=cls)
 
 
 class PartialMessageable(discord.abc.Messageable, Hashable):
