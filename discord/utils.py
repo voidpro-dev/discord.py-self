@@ -1447,7 +1447,7 @@ async def _get_info(session: ClientSession) -> Tuple[Dict[str, Any], str]:
     #    except Exception:
     #        continue
 
-    _log.warning('Info API down. Falling back to manual fetching...')
+    # _log.warning('Info API down. Falling back to manual fetching...')
     ua = await _get_user_agent(session)
     bn = await _get_build_number(session)
     bv = _get_browser_version(ua)
@@ -1455,16 +1455,17 @@ async def _get_info(session: ClientSession) -> Tuple[Dict[str, Any], str]:
         "os":"Windows",
         "browser":"Discord Client",
         "release_channel":"stable",
-        "client_version":"1.0.9023",
+        "client_version":"1.0.9028",
         "os_version":"10.0.19045",
         "os_arch":"x64",
         "app_arch":"ia32",
         "system_locale":"ja",
-        'browser_user_agent': "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) discord/1.0.9023 Chrome/108.0.5359.215 Electron/22.3.26 Safari/537.36",
+        'browser_user_agent': "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) discord/1.0.9028 Chrome/108.0.5359.215 Electron/22.3.26 Safari/537.36",
         "browser_version":"22.3.26",
-        "client_build_number":244874,
-        "native_build_number":39515,
-        "client_event_source":None
+        "client_build_number": 256231,
+        "native_build_number": 41936,
+        "client_event_source": None,
+        "design_id": 0,
     }
     #{"os":"Windows","browser":"Discord Client","release_channel":"stable","client_version":"1.0.9023","os_version":"10.0.19045","os_arch":"x64","app_arch":"ia32","system_locale":"ja","browser_user_agent":"","browser_version":"22.3.26","client_build_number":244874,"native_build_number":39515,"client_event_source":null}
     properties2 = {
@@ -1498,8 +1499,8 @@ async def _get_build_number(session: ClientSession) -> int:  # Thank you Discord
         build_index = build_file.find('buildNumber') + 24
         return int(build_file[build_index : build_index + 6])
     except:
-        _log.critical('Could not fetch client build number. Falling back to hardcoded value...')
-        return 203010
+        # _log.critical('Could not fetch client build number. Falling back to hardcoded value...')
+        return 256231
 
 
 async def _get_user_agent(session: ClientSession) -> str:
