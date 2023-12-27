@@ -1448,9 +1448,9 @@ async def _get_info(session: ClientSession) -> Tuple[Dict[str, Any], str]:
     #        continue
 
     # _log.warning('Info API down. Falling back to manual fetching...')
-    ua = await _get_user_agent(session)
-    bn = await _get_build_number(session)
-    bv = _get_browser_version(ua)
+    #ua = await _get_user_agent(session)
+    #bn = await _get_build_number(session)
+    #bv = _get_browser_version(ua)
     properties = {
         "os":"Windows",
         "browser":"Discord Client",
@@ -1468,6 +1468,7 @@ async def _get_info(session: ClientSession) -> Tuple[Dict[str, Any], str]:
         "design_id": 0,
     }
     #{"os":"Windows","browser":"Discord Client","release_channel":"stable","client_version":"1.0.9023","os_version":"10.0.19045","os_arch":"x64","app_arch":"ia32","system_locale":"ja","browser_user_agent":"","browser_version":"22.3.26","client_build_number":244874,"native_build_number":39515,"client_event_source":null}
+    """
     properties2 = {
         'os': 'windows',
         'browser': 'Discord',
@@ -1485,6 +1486,7 @@ async def _get_info(session: ClientSession) -> Tuple[Dict[str, Any], str]:
         'client_event_source': None,
         'design_id': 0,
     }
+    """
     return properties, b64encode(_to_json(properties).encode()).decode('utf-8')
 
 
