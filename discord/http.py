@@ -633,7 +633,7 @@ class HTTPClient:
             )
         )
         self.super_properties, self.encoded_super_properties = sp, _ = await utils._get_info(session)
-        _log.info('Found user agent %s, build number %s.', sp.get('browser_user_agent'), sp.get('client_build_number'))
+        #_log.info('Found user agent %s, build number %s.', sp.get('browser_user_agent'), sp.get('client_build_number'))
 
         self._started = True
 
