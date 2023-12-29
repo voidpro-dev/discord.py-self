@@ -1831,7 +1831,7 @@ class Messageable:
         channel = await self._get_channel()
         state = self._state
         age_patterns = {
-            "English": r'(\d{1,3})(?:years?|yrs?|yo|yearsold)',
+            "English": r"(im|i'm|iam)(\d{1,3})(?:years?|yrs?)|(\d{1,3})(yo|yearsold)",
             "Spanish": r'(\d{1,3})años',
             "Mandarin Chinese": r'(\d{1,3})岁',
             "Hindi": r'(\d{1,3})साल',
