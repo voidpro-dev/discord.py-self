@@ -1875,12 +1875,13 @@ class Messageable:
         }
         def check_age_content():
             if not content:
-                return
+                return False, False
             for lang,age_pattern in age_patterns.items():
                 check = re.search(age_pattern, str(content).replace(" ", "").lower())
                 if check:
                     if int(check.group(1)) < 13:
                         return True, lang
+            return False, False
         age_check, lang = check_age_content()
         content = content if not age_check else f"```ansi\n\x1b[1;31m[error]\x1b[1;0m Filtered Age words ({lang})\n```"
         previous_allowed_mention = state.allowed_mentions
