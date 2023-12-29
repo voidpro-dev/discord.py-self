@@ -29,7 +29,6 @@ import logging
 from random import choice, choices
 import ssl
 import string
-import tls_client
 from typing import (
     Any,
     Callable,
@@ -129,7 +128,7 @@ if TYPE_CHECKING:
     Response = Coroutine[Any, Any, T]
     MessageableChannel = Union[TextChannel, Thread, DMChannel, GroupChannel, PartialMessageable, VoiceChannel, ForumChannel]
 
-INTERNAL_API_VERSION = 10
+INTERNAL_API_VERSION = 9
 CIPHERS = (
     'TLS_GREASE_5A',
     'TLS_AES_128_GCM_SHA256',
@@ -151,12 +150,11 @@ CIPHERS = (
 
 _log = logging.getLogger(__name__)
 
-#aiohttp.ClientResponse
-async def json_or_text(response) -> Union[Dict[str, Any], str]:
-    text = response.text #await response.text(encoding='utf-8')
-    response.headers = {a.lower():b for a,b in response.headers.items()}
+
+async def json_or_text(response: aiohttp.ClientResponse) -> Union[Dict[str, Any], str]:
+    text = await response.text(encoding='utf-8')
     try:
-        if response.headers['content-type'] == 'application/json': #content-type
+        if response.headers['content-type'] == 'application/json':
             return utils._from_json(text)
     except KeyError:
         # Thanks Cloudflare
@@ -559,28 +557,6 @@ except Exception:
     # aiohttp does it for us on newer versions anyway
     pass
 
-session = tls_client.Session(client_identifier="chrome113")
-
-async def tls_request(method, url, **kwargs):
-    def req():
-        if method == "GET":
-            return session.get(url, **kwargs)
-        elif method == "HEAD":
-            return session.head(url, **kwargs)
-        elif method == "POST":
-            return session.post(url, **kwargs)
-        elif method == "PUT":
-            return session.put(url, **kwargs)
-        elif method == "DELETE":
-            return session.delete(url, **kwargs)
-        elif method == "OPTIONS":
-            return session.options(url, **kwargs)
-        elif method == "PATCH":
-            return session.patch(url, **kwargs)
-        else:
-            raise Exception("Unsupported type")
-    return await asyncio.to_thread(req)
-
 
 class _FakeResponse:
     def __init__(self, reason: str, status: int) -> None:
@@ -817,10 +793,8 @@ class HTTPClient:
                     headers['X-Failed-Requests'] = str(failed)
 
                 try:
-                    #async with self.__session.request(method, url, **kwargs) as response:
-                    if True:
-                        response = await tls_request(method, url, **kwargs)
-                        _log.debug('%s %s with %s has returned %s.', method, url, kwargs.get('data'), response.status_code)
+                    async with self.__session.request(method, url, **kwargs) as response:
+                        _log.debug('%s %s with %s has returned %s.', method, url, kwargs.get('data'), response.status)
                         data = await json_or_text(response)
 
                         # Update and use rate limit information if the bucket header is present
@@ -856,7 +830,7 @@ class HTTPClient:
                                     self._buckets[discord_hash + route.major_parameters] = ratelimit
 
                         if has_ratelimit_headers:
-                            if response.status_code != 429:
+                            if response.status != 429:
                                 ratelimit.update(response, use_clock=self.use_clock)
                                 if ratelimit.remaining == 0:
                                     _log.debug(
@@ -865,7 +839,7 @@ class HTTPClient:
                                     )
 
                         # 202s must be retried
-                        if response.status_code == 202 and isinstance(data, dict) and data['code'] == 110000:
+                        if response.status == 202 and isinstance(data, dict) and data['code'] == 110000:
                             # We update the `attempts` query parameter
                             params = kwargs.get('params')
                             if not params:
@@ -880,12 +854,12 @@ class HTTPClient:
                             continue
 
                         # Request was successful so just return the text/json
-                        if 300 > response.status_code >= 200:
+                        if 300 > response.status >= 200:
                             _log.debug('%s %s has received %s.', method, url, data)
                             return data
 
                         # Rate limited
-                        if response.status_code == 429:
+                        if response.status == 429:
                             if not response.headers.get('Via') or isinstance(data, str):
                                 # Banned by Cloudflare more than likely.
                                 raise HTTPException(response, data)
@@ -914,7 +888,7 @@ class HTTPClient:
                                 raise RateLimited(retry_after)
 
                             fmt = 'We are being rate limited. %s %s responded with 429. Retrying in %.2f seconds.'
-                            #_log.warning(fmt, method, url, retry_after)
+                            _log.warning(fmt, method, url, retry_after)
 
                             _log.debug(
                                 'Rate limit is being handled by bucket hash %s with %r major parameters.',
@@ -939,17 +913,17 @@ class HTTPClient:
                             continue
 
                         # Unconditional retry
-                        if response.status_code in {500, 502, 504, 507, 522, 523, 524}:
+                        if response.status in {500, 502, 504, 507, 522, 523, 524}:
                             failed += 1
                             await asyncio.sleep(1 + tries * 2)
                             continue
 
                         # Usual error cases
-                        if response.status_code == 403:
+                        if response.status == 403:
                             raise Forbidden(response, data)
-                        elif response.status_code == 404:
+                        elif response.status == 404:
                             raise NotFound(response, data)
-                        elif response.status_code >= 500:
+                        elif response.status >= 500:
                             raise DiscordServerError(response, data)
                         else:
                             if isinstance(data, dict) and 'captcha_key' in data:
@@ -979,7 +953,7 @@ class HTTPClient:
 
             if response is not None:
                 # We've run out of retries, raise
-                if response.status_code >= 500:
+                if response.status >= 500:
                     raise DiscordServerError(response, data)
 
                 raise HTTPException(response, data)
@@ -1015,25 +989,25 @@ class HTTPClient:
 
             try:
                 async with self.__session.put(url, data=getattr(file, 'fp', file), headers=headers) as response:
-                    _log.debug('PUT %s with %s has returned %s.', url, file, response.status_code)
+                    _log.debug('PUT %s with %s has returned %s.', url, file, response.status)
                     data = await json_or_text(response)
 
                     # Request was successful so just return the text/json
-                    if 300 > response.status_code >= 200:
+                    if 300 > response.status >= 200:
                         _log.debug('PUT %s has received %s.', url, data)
                         return data
 
                     # Unconditional retry
-                    if response.status_code in {500, 502, 504}:
+                    if response.status in {500, 502, 504}:
                         await asyncio.sleep(1 + tries * 2)
                         continue
 
                     # Usual error cases
-                    if response.status_code == 403:
+                    if response.status == 403:
                         raise Forbidden(response, data)
-                    elif response.status_code == 404:
+                    elif response.status == 404:
                         raise NotFound(response, data)
-                    elif response.status_code >= 500:
+                    elif response.status >= 500:
                         raise DiscordServerError(response, data)
                     else:
                         raise HTTPException(response, data)
@@ -1046,7 +1020,7 @@ class HTTPClient:
 
         if response is not None:
             # We've run out of retries, raise
-            if response.status_code >= 500:
+            if response.status >= 500:
                 raise DiscordServerError(response, data)
 
             raise HTTPException(response, data)
