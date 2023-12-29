@@ -153,7 +153,7 @@ _log = logging.getLogger(__name__)
 
 
 async def json_or_text(response: aiohttp.ClientResponse) -> Union[Dict[str, Any], str]:
-    text = await response.text(encoding='utf-8')
+    text = response.text #await response.text(encoding='utf-8')
     try:
         if response.headers['content-type'] == 'application/json':
             return utils._from_json(text)
