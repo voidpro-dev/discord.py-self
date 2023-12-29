@@ -1830,8 +1830,59 @@ class Messageable:
 
         channel = await self._get_channel()
         state = self._state
-        check = re.search("((i'm|iam)\d)|(\d(歳|yearsold|さい))", str(content).replace(" ", "").lower()) if content else None
-        content = content if content and not check else content if not check else "```ansi\n\x1b[1;31m[error]\x1b[1;0m Filtered Age words\n```"
+        age_patterns = {
+            "English": r'\b(\d{1,3})\s*(?:years?|yrs?|yo|yearsold)\b',
+            "Spanish": r'\b(\d{1,3})\s*años\b',
+            "Mandarin Chinese": r'\b(\d{1,3})\s*岁\b',
+            "Hindi": r'\b(\d{1,3})\s*साल\b',
+            "Arabic": r'\b(\d{1,3})\s*سنة\b',
+            "Portuguese": r'\b(\d{1,3})\s*anos\b',
+            "Bengali": r'\b(\d{1,3})\s*বছর\b',
+            "Russian": r'\b(\d{1,3})\s*лет\b',
+            "Japanese": r'\b(\d{1,3})\s*(歳|さい)\b',
+            "German": r'\b(\d{1,3})\s*Jahre\b',
+            "French": r'\b(\d{1,3})\s*ans\b',
+            "Urdu": r'\b(\d{1,3})\s*سال\b',
+            "Indonesian": r'\b(\d{1,3})\s*tahun\b',
+            "Italian": r'\b(\d{1,3})\s*anni\b',
+            "Tagalog": r'\b(\d{1,3})\s*taon\b',
+            "Farsi": r'\b(\d{1,3})\s*سال\b',
+            "Polish": r'\b(\d{1,3})\s*lat\b',
+            "Thai": r'\b(\d{1,3})\s*ปี\b',
+            "Dutch": r'\b(\d{1,3})\s*jaar\b',
+            "Tamil": r'\b(\d{1,3})\s*வயது\b',
+            "Greek": r'\b(\d{1,3})\s*χρόνων\b',
+            "Kurdish": r'\b(\d{1,3})\s*sal\b',
+            "Ukrainian": r'\b(\d{1,3})\s*років\b',
+            "Czech": r'\b(\d{1,3})\s*let\b',
+            "Swedish": r'\b(\d{1,3})\s*år\b',
+            "Finnish": r'\b(\d{1,3})\s*vuotta\b',
+            "Norwegian": r'\b(\d{1,3})\s*år\b',
+            "Hungarian": r'\b(\d{1,3})\s*év\b',
+            "Danish": r'\b(\d{1,3})\s*år\b',
+            "Malay": r'\b(\d{1,3})\s*tahun\b',
+            "Croatian": r'\b(\d{1,3})\s*godina\b',
+            "Serbian": r'\b(\d{1,3})\s*година\b',
+            "Bulgarian": r'\b(\d{1,3})\s*години\b',
+            "Slovak": r'\b(\d{1,3})\s*rokov\b',
+            "Lithuanian": r'\b(\d{1,3})\s*metai\b',
+            "Slovenian": r'\b(\d{1,3})\s*let\b',
+            "Latvian": r'\b(\d{1,3})\s*gadi\b',
+            "Estonian": r'\b(\d{1,3})\s*aastat\b',
+            "Vietnamese": r'\b(\d{1,3})\s*tuổi\b',
+            "Mongolian": r'\b(\d{1,3})\s*нас\b',
+            "Romani": r'\b(\d{1,3})\s*vojb\b',
+        }
+        def check_age_content():
+            if not content:
+                return
+            for age_pattern in age_patterns:
+                check = re.search(age_pattern, str(content).replace(" ", "").lower())
+                if check:
+                    if int(check.group(1)) < 13:
+                        return True
+        age_check = check_age_content()
+        content = content if content and not age_check else content if not age_check else "```ansi\n\x1b[1;31m[error]\x1b[1;0m Filtered Age words\n```"
         previous_allowed_mention = state.allowed_mentions
 
         if nonce is MISSING:
