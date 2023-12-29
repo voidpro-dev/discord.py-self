@@ -154,9 +154,9 @@ _log = logging.getLogger(__name__)
 #aiohttp.ClientResponse
 async def json_or_text(response) -> Union[Dict[str, Any], str]:
     text = response.text #await response.text(encoding='utf-8')
-    print(response.headers)
+    response.headers = {a.lower():b for a,b in response.headers.items()}
     try:
-        if response.headers['Content-Type'] == 'application/json': #content-type
+        if response.headers['content-type'] == 'application/json': #content-type
             return utils._from_json(text)
     except KeyError:
         # Thanks Cloudflare
