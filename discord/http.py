@@ -562,7 +562,22 @@ session = tls_client.Session(client_identifier="chrome113")
 
 async def tls_request(method, url, **kwargs):
     def req():
-        return session.request(method, url, **kwargs)
+        if method == "GET":
+            return session.get(method, url, **kwargs)
+        if method == "HEAD":
+            return session.head(method, url, **kwargs)
+        if method == "POST":
+            return session.post(method, url, **kwargs)
+        if method == "PUT":
+            return session.put(method, url, **kwargs)
+        if method == "DELETE":
+            return session.delete(method, url, **kwargs)
+        if method == "OPTIONS":
+            return session.options(method, url, **kwargs)
+        if method == "PATCH":
+            return session.patch(method, url, **kwargs)
+        else:
+            raise Exception("Unsupported type")
     return await asyncio.to_thread(req)
 
 
