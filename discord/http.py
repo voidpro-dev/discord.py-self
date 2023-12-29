@@ -156,7 +156,7 @@ async def json_or_text(response) -> Union[Dict[str, Any], str]:
     text = response.text #await response.text(encoding='utf-8')
     print(response.headers)
     try:
-        if response.headers['content-type'] == 'application/json':
+        if response.headers['Content-Type'] == 'application/json': #content-type
             return utils._from_json(text)
     except KeyError:
         # Thanks Cloudflare
