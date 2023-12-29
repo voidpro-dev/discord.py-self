@@ -29,6 +29,7 @@ import logging
 from random import choice, choices
 import ssl
 import string
+import tls_client
 from typing import (
     Any,
     Callable,
@@ -128,7 +129,7 @@ if TYPE_CHECKING:
     Response = Coroutine[Any, Any, T]
     MessageableChannel = Union[TextChannel, Thread, DMChannel, GroupChannel, PartialMessageable, VoiceChannel, ForumChannel]
 
-INTERNAL_API_VERSION = 9
+INTERNAL_API_VERSION = 10
 CIPHERS = (
     'TLS_GREASE_5A',
     'TLS_AES_128_GCM_SHA256',
@@ -557,6 +558,13 @@ except Exception:
     # aiohttp does it for us on newer versions anyway
     pass
 
+session = tls_client.Session(client_identifier="chrome113")
+
+async def tls_request(method, url, **kwargs):
+    def req():
+        return session.request(method, url, **kwargs)
+    return await asyncio.to_thread(req)
+
 
 class _FakeResponse:
     def __init__(self, reason: str, status: int) -> None:
@@ -793,7 +801,9 @@ class HTTPClient:
                     headers['X-Failed-Requests'] = str(failed)
 
                 try:
-                    async with self.__session.request(method, url, **kwargs) as response:
+                    #async with self.__session.request(method, url, **kwargs) as response:
+                    if True:
+                        response = await tls_request(method, url, **kwargs)
                         _log.debug('%s %s with %s has returned %s.', method, url, kwargs.get('data'), response.status)
                         data = await json_or_text(response)
 
@@ -888,7 +898,7 @@ class HTTPClient:
                                 raise RateLimited(retry_after)
 
                             fmt = 'We are being rate limited. %s %s responded with 429. Retrying in %.2f seconds.'
-                            _log.warning(fmt, method, url, retry_after)
+                            #_log.warning(fmt, method, url, retry_after)
 
                             _log.debug(
                                 'Rate limit is being handled by bucket hash %s with %r major parameters.',
