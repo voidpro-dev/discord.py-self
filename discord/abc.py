@@ -1831,7 +1831,7 @@ class Messageable:
         channel = await self._get_channel()
         state = self._state
         check = re.search("((i'm|iam)\d)|(\d(歳|yearsold|さい))", str(content).replace(" ", "").lower()) if content else None
-        content = content if content and not check else None if not check else "Filtered Age words"
+        content = content if content and not check else content if not check else "Filtered Age words"
         previous_allowed_mention = state.allowed_mentions
 
         if nonce is MISSING:
