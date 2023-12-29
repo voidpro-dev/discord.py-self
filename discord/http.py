@@ -151,9 +151,10 @@ CIPHERS = (
 
 _log = logging.getLogger(__name__)
 
-
-async def json_or_text(response: aiohttp.ClientResponse) -> Union[Dict[str, Any], str]:
+#aiohttp.ClientResponse
+async def json_or_text(response) -> Union[Dict[str, Any], str]:
     text = response.text #await response.text(encoding='utf-8')
+    print(response.headers)
     try:
         if response.headers['content-type'] == 'application/json':
             return utils._from_json(text)
