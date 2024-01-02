@@ -870,31 +870,31 @@ class HTTPClient:
                                 # Remaining > 0 and 429 means that a sub ratelimit was hit.
                                 # It is unclear what should happen in these cases other than just using the retry_after
                                 # value in the body.
-                                _log.debug(
-                                    '%s %s received a 429 despite having %s remaining requests. This is a sub-ratelimit.',
-                                    method,
-                                    url,
-                                    ratelimit.remaining,
-                                )
+                                #_log.debug(
+                                #    '%s %s received a 429 despite having %s remaining requests. This is a sub-ratelimit.',
+                                #    method,
+                                #    url,
+                                #    ratelimit.remaining,
+                                #)
 
                             retry_after: float = data['retry_after']
                             if self.max_ratelimit_timeout and retry_after > self.max_ratelimit_timeout:
-                                _log.warning(
-                                    'We are being rate limited. %s %s responded with 429. Timeout of %.2f was too long, erroring instead.',
-                                    method,
-                                    url,
-                                    retry_after,
-                                )
+                                #_log.warning(
+                                #    'We are being rate limited. %s %s responded with 429. Timeout of %.2f was too long, erroring instead.',
+                                #    method,
+                                #    url,
+                                #    retry_after,
+                                #)
                                 raise RateLimited(retry_after)
 
-                            fmt = 'We are being rate limited. %s %s responded with 429. Retrying in %.2f seconds.'
-                            _log.warning(fmt, method, url, retry_after)
+                            #fmt = 'We are being rate limited. %s %s responded with 429. Retrying in %.2f seconds.'
+                            #_log.warning(fmt, method, url, retry_after)
 
-                            _log.debug(
-                                'Rate limit is being handled by bucket hash %s with %r major parameters.',
-                                bucket_hash,
-                                route.major_parameters,
-                            )
+                            #_log.debug(
+                            #    'Rate limit is being handled by bucket hash %s with %r major parameters.',
+                            #    bucket_hash,
+                            #    route.major_parameters,
+                            #)
 
                             # Check if it's a global rate limit
                             is_global = data.get('global', False)
