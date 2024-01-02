@@ -876,6 +876,7 @@ class HTTPClient:
                                 #    url,
                                 #    ratelimit.remaining,
                                 #)
+                                pass
 
                             retry_after: float = data['retry_after']
                             if self.max_ratelimit_timeout and retry_after > self.max_ratelimit_timeout:
