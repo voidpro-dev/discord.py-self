@@ -655,12 +655,18 @@ class AudioPlayer(threading.Thread):
         self._current_error: Optional[Exception] = None
         self._connected: threading.Event = client._connected
         self._lock: threading.Lock = threading.Lock()
+        self._cache_end = False
+        self._cache = []
 
         if after is not None and not callable(after):
             raise TypeError('Expected a callable for the "after" parameter.')
 
     def _do_run(self) -> None:
         self.loops = 0
+        self._loops = 0
+        threading.Thread(target=self._cache_worker, daemon=True).start()
+        while not len(self.cache) > 20*3 and not self._cache_end:
+            time.sleep(0.1)
         self._start = time.perf_counter()
 
         # getattr lookup speed ups
@@ -679,21 +685,43 @@ class AudioPlayer(threading.Thread):
                 # wait until we are connected
                 self._connected.wait()
                 # reset our internal data
-                self.loops = 0
+                self._loops = 0
                 self._start = time.perf_counter()
 
-            self.loops += 1
-            data = self.source.read()
+            #self.loops += 1
+            #self._loops += 1
+            #data = self.source.read()
 
-            if not data:
-                self.stop()
-                break
+            #if not data:
+            #    self.stop()
+            #    break
 
-            play_audio(data, encode=not self.source.is_opus())
-            next_time = self._start + self.DELAY * self.loops
-            delay = max(0, self.DELAY + (next_time - time.perf_counter()))
-            time.sleep(delay)
+            #play_audio(data, encode=not self.source.is_opus())
+            next_time = self._start + self.DELAY * self._loops
+            #delay = max(0, self.DELAY + (next_time - time.perf_counter()))
+            if next_time <= self.DELAY:
+                try:
+                    data = self.cache.pop(0)
+                except:
+                    self.stop()
+                    break
+                self.loops += 1
+                self._loops += 1
+                play_audio(data)
+            time.sleep(0.01)
 
+    def _cache_worker(self) -> None:
+        get_encrypted_audio = self.client.get_audio_packet
+        while True:
+            if len(self._cache) > 20*30: # frame/s * second
+                time.sleep(0.1)
+            else:
+                data = self.source.read()
+                if not data:
+                    break
+                self._cache.append(get_encrypted_audio(data))
+        self._cache_end = True
+        
     def run(self) -> None:
         try:
             self._do_run()
@@ -703,7 +731,7 @@ class AudioPlayer(threading.Thread):
         finally:
             self._call_after()
             self.source.cleanup()
-
+    
     def _call_after(self) -> None:
         error = self._current_error
 
