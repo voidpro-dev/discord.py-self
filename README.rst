@@ -31,26 +31,16 @@ Key Features
 - (not original) Fix the build number and related information to stabilize and reduce captchas when joining guilds as much as possible.
 - (not original) Optimized transmission of voice packets.
 - Implements vast amounts of the user account-specific API. For a non-exhaustive list:
-
-  - Sessions
-
-  - Read states
-
-  - Connections
-
-  - Relationships
-
-  - Experiments
-
-  - Protobuf user settings
-
-  - Application/team management
-
-  - Store/SKUs/entitlements
-
-  - Billing (e.g. subscriptions, payments, boosts, promotions, etc.)
-
-  - Interactions (slash commands, buttons, etc.)
+   Sessions
+   Read states
+   Connections
+   Relationships
+   Experiments
+   Protobuf user settings
+   Application/team management
+   Store/SKUs/entitlements
+   Billing (e.g. subscriptions, payments, boosts, promotions, etc.)
+   Interactions (slash commands, buttons, etc.)
 
 
 Installing
