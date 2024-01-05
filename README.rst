@@ -1,15 +1,5 @@
-discord.py-self
+discord.py-self (stable)
 ================
-
-.. image:: https://img.shields.io/pypi/v/discord.py-self.svg
-   :target: https://pypi.python.org/pypi/discord.py-self
-   :alt: PyPI version info
-.. image:: https://img.shields.io/pypi/pyversions/discord.py.svg
-   :target: https://pypi.python.org/pypi/discord.py-self
-   :alt: PyPI supported Python versions
-.. image:: https://img.shields.io/pypi/dm/discord.py-self.svg
-   :target: https://pypi.python.org/pypi/discord.py-self
-   :alt: PyPI downloads per month
 
 A modern, easy to use, feature-rich, and async ready API wrapper for Discord's user API written in Python.
 
@@ -25,6 +15,7 @@ These changes have become too numerous to mention, so check out our `docs <https
 
 - `Rapptz <https://github.com/Rapptz>`_ for the original library this fork is based on. Without it, the project would not exist.
 - `arandomnewaccount <https://www.reddit.com/user/obviouslymymain123/>`_ for help when the project was first started.
+- `dolfies <https://github.com/dolfies>`_ Producer of the original discord.py-self.
 
 Key Features
 -------------
@@ -34,6 +25,11 @@ Key Features
 - Optimised in both speed and memory.
 - Mostly compatible with the upstream ``discord.py``.
 - Prevents user account automation detection.
+- (not original) Reduce the amount of logging that overwhelms the console, such as rate limits.
+- (not original) Fixed problem of not replying to own messages (need to add code to prevent looping).
+- (not original) Reduce account disabling due to age restrictions.
+- (not original) Fix the build number and related information to stabilize and reduce captchas when joining guilds as much as possible.
+- (not original) Optimized transmission of voice packets.
 - Implements vast amounts of the user account-specific API. For a non-exhaustive list:
 
   * Sessions
