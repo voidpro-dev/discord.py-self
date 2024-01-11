@@ -23,7 +23,7 @@ DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
 age_patterns = {
-    "English1": r"(im|i'm|iam|)(\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)",
+    "English1": r"(im|i'm|iam)(\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)",
     "English2": r"(\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)(yearsold|yrs|yo)",
     "Spanish": r'(\d{1,2}|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce)(años|añitos)',
     "Mandarin Chinese": r'(\d{1,2}|一|二|三|四|五|六|七|八|九|十一|十二)(岁|歲)',
