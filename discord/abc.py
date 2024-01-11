@@ -31,7 +31,7 @@ age_patterns = {
     "Portuguese": r'(\d{1,2}|um|dois|três|quatro|cinco|seis|sete|oito|nove|dez|onze|doze)(anos|aninhos)',
     "Bengali": r'(\d{1,2}|এক|দুই|তিন|চার|পাঁচ|ছয়|সাত|আট|নয়|দশ)(বছর|বছরে)',
     "Russian": r'(\d{1,2}|один|два|три|четыре|пять|шесть|семь|восемь|девять|десять|одиннадцать|двенадцать)(лет|годиков)',
-    "Japanese": r'(\d{1,2}|一|二|三|四|五|六|七|八|九|十一|十二)(歳|才)',
+    "Japanese": r'(\d{1,2}|一|二|三|四|五|六|七|八|九|十一|十二)(歳|才|さい|サイ|ｻｲ)',
     "German": r'(\d{1,2}|eins|zwei|drei|vier|fünf|sechs|sieben|acht|neun|zehn|elf|zwölf)(Jahre|Jährchen)',
     "French": r'(\d{1,2}|un|deux|trois|quatre|cinq|six|sept|huit|neuf|dix|onze|douze)(ans|ansounets)',
     "Urdu": r'(\d{1,2}|ایک|دو|تین|چار|پانچ|چھ|سات|آٹھ|نو|دس| گیارہ| بارہ)سال',
