@@ -21,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
+from __future__ import annotations
 age_patterns = {
     "English1": r"(im|i'm|iam|)(\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)",
     "English2": r"(\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)(yearsold|yrs|yo)",
@@ -65,8 +66,6 @@ age_patterns = {
     "Mongolian": r'(\d{1,2}|нэг|хоёр|гурав|дөрөв|тав|зургаа|долоо|найм|ес|арав|арван нэг|арван хоёр)нас',
     "Romani": r'(\d{1,2}|ek|duj|trin|štar|pandž|šeš|ifta|oxto|inija|deš|jekh|diklisi)vojb',
 }
-
-from __future__ import annotations
 
 import copy
 import asyncio
