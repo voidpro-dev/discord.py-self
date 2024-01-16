@@ -915,14 +915,18 @@ class PartialMessage(Hashable):
             if not content:
                 return False, False
             for lang,age_pattern in age_patterns.items():
-                check = re.search(age_pattern, str(content).replace(" ", "").lower())
+                check = re.findall(age_pattern, str(content).replace(" ", "").lower())
                 if check:
-                    try:
-                        if int(check.group(1)) < 13:
-                            return True, lang
-                    except:
-                        if int(check.group(2)) < 13:
-                            return True, lang
+                    for a in check:
+                        try:
+                            if int(a[0]) < 13:
+                                return True, lang
+                        except:
+                            try:
+                                if int(a[1]) < 13:
+                                    return True, lang
+                            except:
+                                return True, lang
             return False, False
         age_check, lang = check_age_content()
         content = content if not age_check else f"```ansi\n\x1b[1;31m[error]\x1b[1;0m Filtered Age words ({lang})\n```"
