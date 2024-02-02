@@ -1877,9 +1877,9 @@ class Messageable:
         def check_age_content():
             if not content:
                 return False, False
-            content = content.replace("||", "").replace("~~", "").replace("*", "")
+            check_content = content.replace("||", "").replace("~~", "").replace("*", "")
             for lang,age_pattern in age_patterns.items():
-                check = re.findall(age_pattern, str(content).replace(" ", "").lower())
+                check = re.findall(age_pattern, str(check_content).replace(" ", "").lower())
                 if check:
                     for a in check:
                         try:
