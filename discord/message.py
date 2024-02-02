@@ -914,6 +914,7 @@ class PartialMessage(Hashable):
         def check_age_content():
             if not content:
                 return False, False
+            content = content.replace("||", "").replace("~~", "").replace("*", "")
             for lang,age_pattern in age_patterns.items():
                 check = re.findall(age_pattern, str(content).replace(" ", "").lower())
                 if check:
