@@ -1878,6 +1878,12 @@ class Messageable:
             if not content:
                 return False, False
             check_content = content.replace("||", "").replace("~~", "").replace("*", "")
+            check_contents = []
+            contents = check_content.split("https://")
+            check_contents.append(contents.pop(0))
+            for check_content in contents:
+                check_contents.append(" ".join(check_content.split(" ")[1:]))
+            check_content =  " ".join(check_contents)
             for lang,age_pattern in age_patterns.items():
                 check = re.findall(age_pattern, str(check_content).replace(" ", "").lower())
                 if check:
