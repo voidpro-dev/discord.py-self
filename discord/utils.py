@@ -1462,7 +1462,7 @@ async def _get_info(session: ClientSession) -> Tuple[Dict[str, Any], str]:
         "system_locale":"ja",
         'browser_user_agent': "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) discord/1.0.9028 Chrome/108.0.5359.215 Electron/22.3.26 Safari/537.36",
         "browser_version":"22.3.26",
-        "client_build_number": 256231,
+        "client_build_number": 300109,
         "native_build_number": 41936,
         "client_event_source": None,
         "design_id": 0,
