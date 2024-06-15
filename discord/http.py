@@ -2299,7 +2299,9 @@ class HTTPClient:
                 channel_type=getattr(message.channel, 'type', None),
                 message_id=message.id,
             )
-        elif type is InviteType.guild or type is InviteType.group_dm:  # Join Guild, Accept Invite Page
+        elif type is InviteType.guild: # Join Guild
+            props = ContextProperties.from_join_guild(guild_id=guild_id, channel_id=channel_id, channel_type=channel_type)
+        elif type is InviteType.group_dm:  # Accept Invite Page
             props = choice(
                 (
                     ContextProperties.from_accept_invite_page,
@@ -2313,7 +2315,7 @@ class HTTPClient:
         payload = {}
         if session_id is not None:
             payload['session_id'] = session_id
-
+        print(props)
         return self.request(
             Route('POST', '/invites/{invite_id}', invite_id=invite_id), context_properties=props, json=payload
         )
