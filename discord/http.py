@@ -714,6 +714,7 @@ class HTTPClient:
             'Accept': '*/*',
             'Accept-Language': 'ja,en-US;q=0.9',
             'Cache-Control': 'no-cache',
+            "Cookie": "locale=en-GB;",
             'Connection': 'keep-alive',
             'Origin': 'https://discord.com',
             'Pragma': 'no-cache',
@@ -724,8 +725,8 @@ class HTTPClient:
             'Sec-Fetch-Dest': 'empty',
             'Sec-Fetch-Mode': 'cors',
             'Sec-Fetch-Site': 'same-origin',
-            'User-Agent': self.user_agent,
-            'X-Discord-Locale': self.get_locale(),
+            'User-Agent': "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) discord/1.0.9048 Chrome/120.0.6099.291 Electron/28.2.10 Safari/537.36",
+            'X-Discord-Locale': "en-GB",
             'X-Debug-Options': 'bugReporterEnabled',
             'X-Super-Properties': self.encoded_super_properties,
         }
