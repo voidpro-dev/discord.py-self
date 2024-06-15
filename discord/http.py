@@ -2319,52 +2319,10 @@ class HTTPClient:
         payload = {}
         if session_id is not None:
             payload['session_id'] = session_id
-        try:
-            session = tls_client.Session(client_identifier="chrome_120")
-            headers = {
-                'authority': 'discord.com',
-                'accept': '*/*',
-                'accept-language': 'ja,en-US;q=0.9',
-                'authorization': self.token,
-                'origin': 'https://discord.com',
-                'referer': 'https://discord.com/channels/@me',
-                'sec-ch-ua': '"Not_A Brand";v="8", "Chromium";v="120"',
-                'sec-ch-ua-mobile': '?0',
-                'sec-ch-ua-platform': '"Windows"',
-                'sec-fetch-dest': 'empty',
-                'sec-fetch-mode': 'cors',
-                'sec-fetch-site': 'same-origin',
-                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) discord/1.0.9048 Chrome/120.0.6099.291 Electron/28.2.10 Safari/537.36',
-                'x-context-properties': props.value,
-                'x-debug-options': 'bugReporterEnabled',
-                'x-discord-locale': 'en-US',
-                'x-discord-timezone': 'Asia/Tokyo',
-                'x-super-properties': self.encoded_super_properties,
-            }
-            response = session.post(f'https://discord.com/api/v9/invites/{invite_id}', headers=headers, json=payload)
-            try:
-                response = response.json()
-            except:
-                response = response.text
-            try:
-                if isinstance(data, dict) and 'captcha_key' in data:
-                    raise CaptchaRequired(response, data)
-                return response
-            except CaptchaRequired as e:
-                headers['X-Captcha-Key'] = await captcha_handler(e)
-                if e.rqtoken:
-                    headers['X-Captcha-Rqtoken'] = e.rqtoken
-                response = session.post(f'https://discord.com/api/v9/invites/{invite_id}', headers=headers, json=payload)
-                try:
-                    response = response.json()
-                except:
-                    response = response.text
-                return response
             
-        except:
-            return self.request(
-                Route('POST', '/invites/{invite_id}', invite_id=invite_id), context_properties=props, json=payload
-            )
+        return self.request(
+            Route('POST', '/invites/{invite_id}', invite_id=invite_id), context_properties=props, json=payload
+        )
 
     def create_invite(
         self,
