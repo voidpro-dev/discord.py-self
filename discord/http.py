@@ -714,15 +714,14 @@ class HTTPClient:
 
         # Header creation
         headers = {
-            'Accept-Language': 'en-US',
+            'Accept': '*/*',
+            'Accept-Language': 'ja,en-US;q=0.9',
             'Cache-Control': 'no-cache',
             'Connection': 'keep-alive',
             'Origin': 'https://discord.com',
             'Pragma': 'no-cache',
             'Referer': 'https://discord.com/channels/@me',
-            'Sec-CH-UA': '"Google Chrome";v="{0}", "Chromium";v="{0}", ";Not-A.Brand";v="24"'.format(
-                self.browser_version.split('.')[0]
-            ),
+            'Sec-CH-UA': '"Not_A Brand";v="8", "Chromium";v="120"',
             'Sec-CH-UA-Mobile': '?0',
             'Sec-CH-UA-Platform': '"Windows"',
             'Sec-Fetch-Dest': 'empty',
@@ -733,7 +732,6 @@ class HTTPClient:
             'X-Debug-Options': 'bugReporterEnabled',
             'X-Super-Properties': self.encoded_super_properties,
         }
-
         # This header isn't really necessary
         # Timezones are annoying, so if it errors, we don't care
         try:
@@ -797,9 +795,20 @@ class HTTPClient:
                     headers['X-Failed-Requests'] = str(failed)
 
                 try:
-                    async with self.__session.request(method, url, **kwargs) as response:
-                        _log.debug('%s %s with %s has returned %s.', method, url, kwargs.get('data'), response.status)
-                        data = await json_or_text(response)
+                    if url.startswith("https://discord.com/api/v9/invites/"):
+                        session = tls_client.Session(client_identifier="chrome_120")
+                        session.proxies.update({"http": self.proxy, "https": self.proxy})
+                        def req():
+                            return session.post(f'https://discord.com/api/v9/invites/{invite_id}', headers=headers, json=payload)
+                        response = await asyncio.to_thread(req)
+                        try:
+                            data = response.json()
+                        except:
+                            data = response.text
+                    else:
+                        async with self.__session.request(method, url, **kwargs) as response:
+                            _log.debug('%s %s with %s has returned %s.', method, url, kwargs.get('data'), response.status)
+                            data = await json_or_text(response)
 
                         # Update and use rate limit information if the bucket header is present
                         discord_hash = response.headers.get('X-Ratelimit-Bucket')
