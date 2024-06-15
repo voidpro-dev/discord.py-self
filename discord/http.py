@@ -53,6 +53,7 @@ from collections import deque
 import datetime
 
 import aiohttp
+import traceback
 
 from .enums import RelationshipAction, InviteType
 from .errors import (
@@ -1043,6 +1044,8 @@ class HTTPClient:
                     await asyncio.sleep(1 + tries * 2)
                     continue
                 raise
+            except:
+                traceback.print_exc()
 
         if response is not None:
             # We've run out of retries, raise
