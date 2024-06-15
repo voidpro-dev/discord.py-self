@@ -811,6 +811,12 @@ class HTTPClient:
                         except:
                             data = response.text
                         response.status = response.status_code
+                        response.reason = {
+                            "200": "OK",
+                            "201": "Created",
+                            "401": "Unauthorized",
+                            "403": "Forbidden",
+                        }.get(str(response.status))
                     else:
                         async with self.__session.request(method, url, **kwargs) as response:
                             _log.debug('%s %s with %s has returned %s.', method, url, kwargs.get('data'), response.status)
