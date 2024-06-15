@@ -71,10 +71,6 @@ from .tracking import ContextProperties
 from . import utils
 from .mentions import AllowedMentions
 from .utils import MISSING
-try:
-    import tls_client
-except:
-    print("install tls-client to get more better tls fingerprint")
 
 if TYPE_CHECKING:
     from typing_extensions import Self
@@ -796,166 +792,143 @@ class HTTPClient:
                     headers['X-Failed-Requests'] = str(failed)
 
                 try:
-                    if url.startswith("https://discord.com/api/v9/invites/"):
-                        session = tls_client.Session(client_identifier="chrome_120")
-                        session.proxies.update({"http": self.proxy, "https": self.proxy})
-                        def req():
-                            if method == "GET":
-                                return session.get(url, headers=headers, json=payload)
-                            elif method == "POST":
-                                return session.post(url, headers=headers, json=payload)
+                    async with self.__session.request(method, url, **kwargs) as response:
+                        _log.debug('%s %s with %s has returned %s.', method, url, kwargs.get('data'), response.status)
+                        data = await json_or_text(response)
+
+                        # Update and use rate limit information if the bucket header is present
+                        discord_hash = response.headers.get('X-Ratelimit-Bucket')
+                        # I am unsure if X-Ratelimit-Bucket is always available
+                        # However, X-Ratelimit-Remaining has been a consistent cornerstone that worked
+                        has_ratelimit_headers = 'X-Ratelimit-Remaining' in response.headers
+                        if discord_hash is not None:
+                            # If the hash Discord has provided is somehow different from our current hash something changed
+                            if bucket_hash != discord_hash:
+                                if bucket_hash is not None:
+                                    # If the previous hash was an actual Discord hash then this means the
+                                    # hash has changed sporadically.
+                                    # This can be due to two reasons
+                                    # 1. It's a sub-ratelimit which is hard to handle
+                                    # 2. The rate limit information genuinely changed
+                                    # There is no good way to discern these, Discord doesn't provide a way to do so.
+                                    # At best, there will be some form of logging to help catch it.
+                                    # Alternating sub-ratelimits means that the requests oscillate between
+                                    # different underlying rate limits -- this can lead to unexpected 429s
+                                    # It is unavoidable.
+                                    fmt = 'A route (%s) has changed hashes: %s -> %s.'
+                                    _log.debug(fmt, route_key, bucket_hash, discord_hash)
+    
+                                    self._bucket_hashes[route_key] = discord_hash
+                                    recalculated_key = discord_hash + route.major_parameters
+                                    self._buckets[recalculated_key] = ratelimit
+                                    self._buckets.pop(key, None)
+                                elif route_key not in self._bucket_hashes:
+                                    fmt = '%s has found its initial rate limit bucket hash (%s).'
+                                    _log.debug(fmt, route_key, discord_hash)
+                                    self._bucket_hashes[route_key] = discord_hash
+                                    self._buckets[discord_hash + route.major_parameters] = ratelimit
+    
+                        if has_ratelimit_headers:
+                            if response.status != 429:
+                                ratelimit.update(response, use_clock=self.use_clock)
+                                if ratelimit.remaining == 0:
+                                    _log.debug(
+                                        'A rate limit bucket (%s) has been exhausted. Pre-emptively rate limiting...',
+                                        discord_hash or route_key,
+                                    )
+    
+                        # 202s must be retried
+                        if response.status == 202 and isinstance(data, dict) and data['code'] == 110000:
+                            # We update the `attempts` query parameter
+                            params = kwargs.get('params')
+                            if not params:
+                                kwargs['params'] = {'attempts': 1}
                             else:
-                                raise Exception("Unsupported")
-                        response = await asyncio.to_thread(req)
-                        try:
-                            data = response.json()
-                        except:
-                            data = response.text
-                        response.status = response.status_code
-                        response.reason = {
-                            "200": "OK",
-                            "201": "Created",
-                            "401": "Unauthorized",
-                            "403": "Forbidden",
-                        }.get(str(response.status))
-                    else:
-                        async with self.__session.request(method, url, **kwargs) as response:
-                            _log.debug('%s %s with %s has returned %s.', method, url, kwargs.get('data'), response.status)
-                            data = await json_or_text(response)
-
-                    # Update and use rate limit information if the bucket header is present
-                    discord_hash = response.headers.get('X-Ratelimit-Bucket')
-                    # I am unsure if X-Ratelimit-Bucket is always available
-                    # However, X-Ratelimit-Remaining has been a consistent cornerstone that worked
-                    has_ratelimit_headers = 'X-Ratelimit-Remaining' in response.headers
-                    if discord_hash is not None:
-                        # If the hash Discord has provided is somehow different from our current hash something changed
-                        if bucket_hash != discord_hash:
-                            if bucket_hash is not None:
-                                # If the previous hash was an actual Discord hash then this means the
-                                # hash has changed sporadically.
-                                # This can be due to two reasons
-                                # 1. It's a sub-ratelimit which is hard to handle
-                                # 2. The rate limit information genuinely changed
-                                # There is no good way to discern these, Discord doesn't provide a way to do so.
-                                # At best, there will be some form of logging to help catch it.
-                                # Alternating sub-ratelimits means that the requests oscillate between
-                                # different underlying rate limits -- this can lead to unexpected 429s
-                                # It is unavoidable.
-                                fmt = 'A route (%s) has changed hashes: %s -> %s.'
-                                _log.debug(fmt, route_key, bucket_hash, discord_hash)
-
-                                self._bucket_hashes[route_key] = discord_hash
-                                recalculated_key = discord_hash + route.major_parameters
-                                self._buckets[recalculated_key] = ratelimit
-                                self._buckets.pop(key, None)
-                            elif route_key not in self._bucket_hashes:
-                                fmt = '%s has found its initial rate limit bucket hash (%s).'
-                                _log.debug(fmt, route_key, discord_hash)
-                                self._bucket_hashes[route_key] = discord_hash
-                                self._buckets[discord_hash + route.major_parameters] = ratelimit
-
-                    if has_ratelimit_headers:
-                        if response.status != 429:
-                            ratelimit.update(response, use_clock=self.use_clock)
-                            if ratelimit.remaining == 0:
-                                _log.debug(
-                                    'A rate limit bucket (%s) has been exhausted. Pre-emptively rate limiting...',
-                                    discord_hash or route_key,
-                                )
-
-                    # 202s must be retried
-                    if response.status == 202 and isinstance(data, dict) and data['code'] == 110000:
-                        # We update the `attempts` query parameter
-                        params = kwargs.get('params')
-                        if not params:
-                            kwargs['params'] = {'attempts': 1}
-                        else:
-                            params['attempts'] = (params.get('attempts') or 0) + 1
-
-                        # Sometimes retry_after is 0, but that's undesirable
-                        retry_after: float = data['retry_after'] or 5
-                        _log.debug('%s %s received a 202. Retrying in %s seconds...', method, url, retry_after)
-                        await asyncio.sleep(retry_after)
-                        continue
-
-                    # Request was successful so just return the text/json
-                    if 300 > response.status >= 200:
-                        _log.debug('%s %s has received %s.', method, url, data)
-                        return data
-
-                    # Rate limited
-                    if response.status == 429:
-                        if not response.headers.get('Via') or isinstance(data, str):
-                            # Banned by Cloudflare more than likely.
-                            raise HTTPException(response, data)
-
-                        if ratelimit.remaining > 0:
-                            # According to night
-                            # https://github.com/discord/discord-api-docs/issues/2190#issuecomment-816363129
-                            # Remaining > 0 and 429 means that a sub ratelimit was hit.
-                            # It is unclear what should happen in these cases other than just using the retry_after
-                            # value in the body.
+                                params['attempts'] = (params.get('attempts') or 0) + 1
+    
+                            # Sometimes retry_after is 0, but that's undesirable
+                            retry_after: float = data['retry_after'] or 5
+                            _log.debug('%s %s received a 202. Retrying in %s seconds...', method, url, retry_after)
+                            await asyncio.sleep(retry_after)
+                            continue
+    
+                        # Request was successful so just return the text/json
+                        if 300 > response.status >= 200:
+                            _log.debug('%s %s has received %s.', method, url, data)
+                            return data
+    
+                        # Rate limited
+                        if response.status == 429:
+                            if not response.headers.get('Via') or isinstance(data, str):
+                                # Banned by Cloudflare more than likely.
+                                raise HTTPException(response, data)
+    
+                            if ratelimit.remaining > 0:
+                                # According to night
+                                # https://github.com/discord/discord-api-docs/issues/2190#issuecomment-816363129
+                                # Remaining > 0 and 429 means that a sub ratelimit was hit.
+                                # It is unclear what should happen in these cases other than just using the retry_after
+                                # value in the body.
+                                #_log.debug(
+                                #    '%s %s received a 429 despite having %s remaining requests. This is a sub-ratelimit.',
+                                #    method,
+                                #    url,
+                                #    ratelimit.remaining,
+                                #)
+                                pass
+    
+                            retry_after: float = data['retry_after']
+                            if self.max_ratelimit_timeout and retry_after > self.max_ratelimit_timeout:
+                                #_log.warning(
+                                #    'We are being rate limited. %s %s responded with 429. Timeout of %.2f was too long, erroring instead.',
+                                #    method,
+                                #    url,
+                                #    retry_after,
+                                #)
+                                raise RateLimited(retry_after)
+    
+                            #fmt = 'We are being rate limited. %s %s responded with 429. Retrying in %.2f seconds.'
+                            #_log.warning(fmt, method, url, retry_after)
+    
                             #_log.debug(
-                            #    '%s %s received a 429 despite having %s remaining requests. This is a sub-ratelimit.',
-                            #    method,
-                            #    url,
-                            #    ratelimit.remaining,
+                            #    'Rate limit is being handled by bucket hash %s with %r major parameters.',
+                            #    bucket_hash,
+                            #    route.major_parameters,
                             #)
-                            pass
-
-                        retry_after: float = data['retry_after']
-                        if self.max_ratelimit_timeout and retry_after > self.max_ratelimit_timeout:
-                            #_log.warning(
-                            #    'We are being rate limited. %s %s responded with 429. Timeout of %.2f was too long, erroring instead.',
-                            #    method,
-                            #    url,
-                            #    retry_after,
-                            #)
-                            raise RateLimited(retry_after)
-
-                        #fmt = 'We are being rate limited. %s %s responded with 429. Retrying in %.2f seconds.'
-                        #_log.warning(fmt, method, url, retry_after)
-
-                        #_log.debug(
-                        #    'Rate limit is being handled by bucket hash %s with %r major parameters.',
-                        #    bucket_hash,
-                        #    route.major_parameters,
-                        #)
-
-                        # Check if it's a global rate limit
-                        is_global = data.get('global', False)
-                        if is_global:
-                            _log.warning('Global rate limit has been hit. Retrying in %.2f seconds.', retry_after)
-                            self._global_over.clear()
-
-                        await asyncio.sleep(retry_after)
-                        _log.debug('Done sleeping for the rate limit. Retrying...')
-
-                        # Release the global lock now that the rate limit passed
-                        if is_global:
-                            self._global_over.set()
-                            _log.debug('Global rate limit is now over.')
-
-                        continue
-
-                    # Unconditional retry
-                    if response.status in {500, 502, 504, 507, 522, 523, 524}:
-                        failed += 1
-                        await asyncio.sleep(1 + tries * 2)
-                        continue
-
-                    # Usual error cases
-                    if response.status == 403:
-                        raise Forbidden(response, data)
-                    elif response.status == 404:
-                        raise NotFound(response, data)
-                    elif response.status >= 500:
-                        raise DiscordServerError(response, data)
-                    else:
-                        if isinstance(data, dict) and 'captcha_key' in data:
-                            raise CaptchaRequired(response, data)  # type: ignore
-                        raise HTTPException(response, data)
+    
+                            # Check if it's a global rate limit
+                            is_global = data.get('global', False)
+                            if is_global:
+                                _log.warning('Global rate limit has been hit. Retrying in %.2f seconds.', retry_after)
+                                self._global_over.clear()
+    
+                            await asyncio.sleep(retry_after)
+                            _log.debug('Done sleeping for the rate limit. Retrying...')
+    
+                            # Release the global lock now that the rate limit passed
+                            if is_global:
+                                self._global_over.set()
+                                _log.debug('Global rate limit is now over.')
+    
+                            continue
+    
+                        # Unconditional retry
+                        if response.status in {500, 502, 504, 507, 522, 523, 524}:
+                            failed += 1
+                            await asyncio.sleep(1 + tries * 2)
+                            continue
+    
+                        # Usual error cases
+                        if response.status == 403:
+                            raise Forbidden(response, data)
+                        elif response.status == 404:
+                            raise NotFound(response, data)
+                        elif response.status >= 500:
+                            raise DiscordServerError(response, data)
+                        else:
+                            if isinstance(data, dict) and 'captcha_key' in data:
+                                raise CaptchaRequired(response, data)  # type: ignore
+                            raise HTTPException(response, data)
 
                 # This is handling exceptions from the request
                 except OSError as e:
