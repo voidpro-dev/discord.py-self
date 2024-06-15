@@ -810,6 +810,7 @@ class HTTPClient:
                             data = response.json()
                         except:
                             data = response.text
+                        response.status = response.status_code
                     else:
                         async with self.__session.request(method, url, **kwargs) as response:
                             _log.debug('%s %s with %s has returned %s.', method, url, kwargs.get('data'), response.status)
