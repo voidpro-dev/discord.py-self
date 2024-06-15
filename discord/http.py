@@ -2315,7 +2315,7 @@ class HTTPClient:
         payload = {}
         if session_id is not None:
             payload['session_id'] = session_id
-        print(props)
+        print(props.value)
         return self.request(
             Route('POST', '/invites/{invite_id}', invite_id=invite_id), context_properties=props, json=payload
         )
