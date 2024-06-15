@@ -977,6 +977,8 @@ class HTTPClient:
                         headers['X-Captcha-Key'] = await captcha_handler(e)
                         if e.rqtoken:
                             headers['X-Captcha-Rqtoken'] = e.rqtoken
+                except:
+                    traceback.print_exc()
 
             if response is not None:
                 # We've run out of retries, raise
