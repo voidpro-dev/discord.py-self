@@ -799,7 +799,12 @@ class HTTPClient:
                         session = tls_client.Session(client_identifier="chrome_120")
                         session.proxies.update({"http": self.proxy, "https": self.proxy})
                         def req():
-                            return session.post(f'https://discord.com/api/v9/invites/{invite_id}', headers=headers, json=payload)
+                            if method == "GET":
+                                return session.get(url, headers=headers, json=payload)
+                            elif method == "POST":
+                                return session.post(url, headers=headers, json=payload)
+                            else:
+                                raise Exception("Unsupported")
                         response = await asyncio.to_thread(req)
                         try:
                             data = response.json()
