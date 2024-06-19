@@ -213,7 +213,10 @@ def flatten_user(cls: T) -> T:
                 return general
 
             func = generate_function(attr)
-            func = utils.copy_doc(value)(func)
+            if type(value) == discord.utils.CachedSlotProperty:
+                func = utils.copy_doc(value.function)(func)
+            else:
+                func = utils.copy_doc(value)(func)
             setattr(cls, attr, func)
 
     return cls
