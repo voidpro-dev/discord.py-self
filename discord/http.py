@@ -188,9 +188,7 @@ async def _gen_session(session: Optional[aiohttp.ClientSession]) -> aiohttp.Clie
     ctx.options |= ssl.OP_NO_SSLv2
     ctx.options |= ssl.OP_NO_SSLv3
     ctx.options |= ssl.OP_NO_COMPRESSION
-    ctx.set_ecdh_curve('secp521r1')
     ctx.set_ecdh_curve('prime256v1')
-    ctx.set_ecdh_curve('secp384r1')
 
     if connector is not None:
         connector._ssl = ctx  # type: ignore # Private attribute assignment
@@ -727,7 +725,7 @@ class HTTPClient:
             'Sec-Fetch-Dest': 'empty',
             'Sec-Fetch-Mode': 'cors',
             'Sec-Fetch-Site': 'same-origin',
-            'User-Agent': "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) discord/1.0.9048 Chrome/120.0.6099.291 Electron/28.2.10 Safari/537.36",
+            'User-Agent': self.user_agent,
             'X-Discord-Locale': "en-GB",
             'X-Debug-Options': 'bugReporterEnabled',
             'X-Super-Properties': self.encoded_super_properties,
