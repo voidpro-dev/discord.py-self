@@ -189,7 +189,7 @@ async def _gen_session(session: Optional[aiohttp.ClientSession]) -> aiohttp.Clie
     ctx.options |= ssl.OP_NO_SSLv3
     ctx.options |= ssl.OP_NO_COMPRESSION
     ctx.set_ecdh_curve('secp521r1')
-    ctx.set_ecdh_curve('secp256r1')
+    ctx.set_ecdh_curve('prime256v1')
     ctx.set_ecdh_curve('secp384r1')
 
     if connector is not None:
