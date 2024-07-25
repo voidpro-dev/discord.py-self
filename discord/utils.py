@@ -1455,17 +1455,16 @@ async def _get_info(session: ClientSession) -> Tuple[Dict[str, Any], str]:
         "os":"Windows",
         "browser":"Discord Client",
         "release_channel":"stable",
-        "client_version":"1.0.9048",
+        "client_version":"1.0.9054",
         "os_version":"10.0.19045",
         "os_arch":"x64",
         "app_arch":"ia32",
         "system_locale":"ja",
-        'browser_user_agent': "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) discord/1.0.9048 Chrome/120.0.6099.291 Electron/28.2.10 Safari/537.36",
-        "browser_version":"28.2.10",
-        "client_build_number": 301920,
-        "native_build_number": 48589,
+        'browser_user_agent': "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) discord/1.0.9054 Chrome/124.0.6367.243 Electron/30.2.0 Safari/537.36",
+        "browser_version":"30.2.0",
+        "client_build_number": 312744,
+        "native_build_number": 49817,
         "client_event_source": None,
-        "design_id": 0,
     }
     #{"os":"Windows","browser":"Discord Client","release_channel":"stable","client_version":"1.0.9023","os_version":"10.0.19045","os_arch":"x64","app_arch":"ia32","system_locale":"ja","browser_user_agent":"","browser_version":"22.3.26","client_build_number":244874,"native_build_number":39515,"client_event_source":null}
     """
