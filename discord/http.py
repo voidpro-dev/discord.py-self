@@ -131,7 +131,6 @@ if TYPE_CHECKING:
 
 INTERNAL_API_VERSION = 9
 CIPHERS = (
-    'TLS_GREASE_5A',
     'TLS_AES_128_GCM_SHA256',
     'TLS_AES_256_GCM_SHA384',
     'TLS_CHACHA20_POLY1305_SHA256',
@@ -148,6 +147,7 @@ CIPHERS = (
     'AES128-SHA',
     'AES256-SHA',
 )
+{"hash":"da261e9a9bceeaf6ed4c2dad3d0067ce","fingerprint":"771,4865-4866-4867-49195-49199-49196-49200-52393-52392-49171-49172-156-157-47-53,11-13-17513-10-5-27-43-23-45-18-35-65281-16-65037-0-51-21,29-23-24,0","ciphers":,"curves":"001D:0017:0018","protocol":"TLSv1.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) discord/1.0.9054 Chrome/124.0.6367.243 Electron/30.2.0 Safari/537.36"}
 
 _log = logging.getLogger(__name__)
 
@@ -188,7 +188,9 @@ async def _gen_session(session: Optional[aiohttp.ClientSession]) -> aiohttp.Clie
     ctx.options |= ssl.OP_NO_SSLv2
     ctx.options |= ssl.OP_NO_SSLv3
     ctx.options |= ssl.OP_NO_COMPRESSION
-    ctx.set_ecdh_curve('prime256v1')
+    ctx.set_ecdh_curve('secp521r1')
+    ctx.set_ecdh_curve('secp256r1')
+    ctx.set_ecdh_curve('secp384r1')
 
     if connector is not None:
         connector._ssl = ctx  # type: ignore # Private attribute assignment
