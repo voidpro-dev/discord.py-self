@@ -1438,7 +1438,7 @@ class ExpiringString(collections.UserString):
         self._timer.cancel()
 
 
-async def _get_info(session: ClientSession) -> Tuple[Dict[str, Any], str]:
+async def _get_info(session: ClientSession, overwrite_properties:dict={}) -> Tuple[Dict[str, Any], str]:
     #for _ in range(3):
     #    try:
     #        async with session.post('https://cordapi.dolfi.es/api/v2/properties/web', timeout=5) as resp:
@@ -1466,6 +1466,7 @@ async def _get_info(session: ClientSession) -> Tuple[Dict[str, Any], str]:
         "native_build_number": 49817,
         "client_event_source": None,
     }
+    properties.update(overwrite_properties)
     #{"os":"Windows","browser":"Discord Client","release_channel":"stable","client_version":"1.0.9023","os_version":"10.0.19045","os_arch":"x64","app_arch":"ia32","system_locale":"ja","browser_user_agent":"","browser_version":"22.3.26","client_build_number":244874,"native_build_number":39515,"client_event_source":null}
     """
     properties2 = {
