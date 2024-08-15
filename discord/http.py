@@ -603,7 +603,8 @@ class HTTPClient:
         self.max_ratelimit_timeout: Optional[float] = max(30.0, max_ratelimit_timeout) if max_ratelimit_timeout else None
         self.get_locale: Callable[[], str] = locale
 
-        self.super_properties: Dict[str, Any] = super_properties
+        self.overwrite_super_properties: Dict[str, Any] = super_properties
+        self.super_properties: Dict[str, Any] = MISSING
         self.encoded_super_properties: str = MISSING
         self._started: bool = False
 
@@ -633,7 +634,7 @@ class HTTPClient:
                 connector=self.connector, trace_configs=None if self.http_trace is None else [self.http_trace]
             )
         )
-        self.super_properties, self.encoded_super_properties = sp, _ = await utils._get_info(session)
+        self.super_properties, self.encoded_super_properties = sp, _ = await utils._get_info(session, self.overwrite_super_properties)
         #_log.info('Found user agent %s, build number %s.', sp.get('browser_user_agent'), sp.get('client_build_number'))
 
         self._started = True
