@@ -914,8 +914,8 @@ class PartialMessage(Hashable):
         def check_age_content():
             if not content:
                 return False, False
-            content = str(content)
-            check_content = content.replace("||", "").replace("~~", "").replace("*", "")
+            check_content = str(content)
+            check_content = check_content.replace("||", "").replace("~~", "").replace("*", "")
             check_contents = []
             contents = check_content.split("https://")
             check_contents.append(contents.pop(0))
