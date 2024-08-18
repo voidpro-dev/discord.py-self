@@ -1873,12 +1873,12 @@ class Messageable:
 
         channel = await self._get_channel()
         state = self._state
-        content = str(content)
         
         def check_age_content():
             if not content:
                 return False, False
-            check_content = content.replace("||", "").replace("~~", "").replace("*", "")
+            check_content = str(content)
+            check_content = check_content.replace("||", "").replace("~~", "").replace("*", "")
             check_contents = []
             contents = check_content.split("https://")
             check_contents.append(contents.pop(0))
