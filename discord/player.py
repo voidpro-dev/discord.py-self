@@ -665,7 +665,7 @@ class AudioPlayer(threading.Thread):
         self.loops = 0
         self._loops = 0
         threading.Thread(target=self._cache_worker, daemon=True).start()
-        while not len(self.cache) > 20*3 and not self._cache_end:
+        while not len(self._cache) > 20*3 and not self._cache_end:
             time.sleep(0.1)
         self._start = time.perf_counter()
 
@@ -701,7 +701,7 @@ class AudioPlayer(threading.Thread):
             #delay = max(0, self.DELAY + (next_time - time.perf_counter()))
             if next_time <= self.DELAY:
                 try:
-                    data = self.cache.pop(0)
+                    data = self._cache.pop(0)
                 except:
                     self.stop()
                     break
