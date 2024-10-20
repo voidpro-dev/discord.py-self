@@ -1455,15 +1455,16 @@ async def _get_info(session: ClientSession, overwrite_properties:dict={}) -> Tup
         "os":"Windows",
         "browser":"Discord Client",
         "release_channel":"stable",
-        "client_version":"1.0.9054",
-        "os_version":"10.0.19045",
+        "client_version":"1.0.9166",
+        "os_version":"10.0.22631",
         "os_arch":"x64",
-        "app_arch":"ia32",
+        "app_arch":"x64",
         "system_locale":"ja",
-        'browser_user_agent': "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) discord/1.0.9054 Chrome/124.0.6367.243 Electron/30.2.0 Safari/537.36",
+        'browser_user_agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) discord/1.0.9166 Chrome/128.0.6613.36 Electron/32.0.0 Safari/537.36",
         "browser_version":"30.2.0",
-        "client_build_number": 312744,
-        "native_build_number": 49817,
+        "os_sdk_version":"22631"
+        "client_build_number": 336973,
+        "native_build_number": 53429,
         "client_event_source": None,
     }
     properties.update(overwrite_properties)
