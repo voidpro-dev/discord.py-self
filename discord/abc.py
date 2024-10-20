@@ -61,7 +61,7 @@ from .sticker import GuildSticker, StickerItem
 from .settings import ChannelSettings
 from .commands import ApplicationCommand, BaseCommand, SlashCommand, UserCommand, MessageCommand, _command_factory
 from .flags import InviteFlags
-from . import utils, filter
+from . import utils, filter as content_filter
 
 __all__ = (
     'Snowflake',
@@ -222,7 +222,7 @@ async def _handle_commands(
         raise TypeError('Cannot specify both query and command_ids')
 
     state = messageable._state
-    endpoint = state.http.search_application_commands
+    endpoint = state.http.search_guild_application_commands
     channel = await messageable._get_channel()
     _, cls = _command_factory(type.value)
     cmd_ids = list(command_ids) if command_ids else None
@@ -237,54 +237,39 @@ async def _handle_commands(
     elif channel.type == ChannelType.group:
         return
 
-    prev_cursor = MISSING
-    cursor = MISSING
-    while True:
-        # We keep two cursors because Discord just sends us an infinite loop sometimes
-        retrieve = min((25 if not cmd_ids else 0) if limit is None else limit, 25)
+    retrieve = min((25 if not cmd_ids else 0) if limit is None else limit, 25)
 
-        if not application_id and limit is not None:
-            limit -= retrieve
-        if (not cmd_ids and retrieve < 1) or cursor is None or (prev_cursor is not MISSING and prev_cursor == cursor):
-            return
+    if not application_id and limit is not None:
+        limit -= retrieve
 
-        data = await endpoint(
-            channel.id,
-            type.value,
-            limit=retrieve if not application_id else None,
-            query=query if not cmd_ids and not application_id else None,
-            command_ids=cmd_ids if not application_id and not cursor else None,  # type: ignore
-            application_id=application_id,
-            include_applications=with_applications if (not application_id or with_applications) else None,
-            cursor=cursor,
-        )
-        prev_cursor = cursor
-        cursor = data['cursor'].get('next')
-        cmds = data['application_commands']
-        apps = {int(app['id']): state.create_integration_application(app) for app in data.get('applications') or []}
+    data = await endpoint(channel.guild.id)
+    cmds = data['application_commands']
+    apps = {int(app['id']): state.create_integration_application(app) for app in data.get('applications') or []}
 
-        for cmd in cmds:
-            # Handle faked parameters
-            if application_id and query and query.lower() not in cmd['name']:
-                continue
-            elif application_id and (not cmd_ids or int(cmd['id']) not in cmd_ids) and limit == 0:
-                continue
+    for cmd in cmds:
+        # Handle faked parameters
+        if not cmd["type"] == type.value:
+            continue
+        if application_id and query and query.lower() not in cmd['name']:
+            continue
+        elif application_id and (not cmd_ids or int(cmd['id']) not in cmd_ids) and limit == 0:
+            continue
 
-            # We follow Discord behavior
-            if application_id and limit is not None and (not cmd_ids or int(cmd['id']) not in cmd_ids):
-                limit -= 1
+        # We follow Discord behavior
+        if application_id and limit is not None and (not cmd_ids or int(cmd['id']) not in cmd_ids):
+            limit -= 1
 
-            try:
-                cmd_ids.remove(int(cmd['id'])) if cmd_ids else None
-            except ValueError:
-                pass
+        try:
+            cmd_ids.remove(int(cmd['id'])) if cmd_ids else None
+        except ValueError:
+            pass
 
-            application = apps.get(int(cmd['application_id']))
-            yield cls(state=state, data=cmd, channel=channel, target=target, application=application)
+        application = apps.get(int(cmd['application_id']))
+        yield cls(state=state, data=cmd, channel=channel, target=target, application=application)
 
-        cmd_ids = None
-        if application_id or len(cmds) < min(limit if limit else 25, 25) or len(cmds) == limit == 25:
-            return
+    cmd_ids = None
+    if application_id or len(cmds) < min(limit if limit else 25, 25) or len(cmds) == limit == 25:
+        return
 
 
 async def _handle_message_search(
@@ -1830,7 +1815,7 @@ class Messageable:
         channel = await self._get_channel()
         state = self._state
         
-        content = filter.check_age_content(content)
+        content = content_filter.check_age_content(content)
         previous_allowed_mention = state.allowed_mentions
 
         if nonce is MISSING:

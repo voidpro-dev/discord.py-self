@@ -1462,7 +1462,7 @@ async def _get_info(session: ClientSession, overwrite_properties:dict={}) -> Tup
         "system_locale":"ja",
         'browser_user_agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) discord/1.0.9166 Chrome/128.0.6613.36 Electron/32.0.0 Safari/537.36",
         "browser_version":"30.2.0",
-        "os_sdk_version":"22631"
+        "os_sdk_version":"22631",
         "client_build_number": 336973,
         "native_build_number": 53429,
         "client_event_source": None,

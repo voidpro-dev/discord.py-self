@@ -225,4 +225,4 @@ class ApplicationCommandCursor(TypedDict):
 class ApplicationCommandSearch(TypedDict):
     application_commands: List[ApplicationCommand]
     applications: Optional[List[IntegrationApplication]]
-    cursor: ApplicationCommandCursor
+    version: Snowflake
